@@ -1,0 +1,229 @@
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SanxIntroGui_Clean"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local lineLeft = Instance.new("Frame")
+lineLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+lineLeft.BorderSizePixel = 0
+lineLeft.Position = UDim2.new(-0.5, 0, 0.5, -2)
+lineLeft.Size = UDim2.new(0.5, 0, 0, 4)
+lineLeft.Parent = screenGui
+
+local lineRight = Instance.new("Frame")
+lineRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+lineRight.BorderSizePixel = 0
+lineRight.Position = UDim2.new(1, 0, 0.5, -2)
+lineRight.Size = UDim2.new(0.5, 0, 0, 4)
+lineRight.Parent = screenGui
+
+local flashFrame = Instance.new("Frame")
+flashFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+flashFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+flashFrame.Size = UDim2.new(0, 0, 0, 0)
+flashFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+flashFrame.BorderSizePixel = 0
+flashFrame.ClipsDescendants = true
+flashFrame.Parent = screenGui
+
+local flashGradient = Instance.new("UIGradient")
+flashGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 5, 20)),
+	ColorSequenceKeypoint.new(0.2, Color3.fromRGB(20, 5, 12)),
+	ColorSequenceKeypoint.new(0.4, Color3.fromRGB(5, 12, 20)),
+	ColorSequenceKeypoint.new(0.6, Color3.fromRGB(5, 20, 10)),
+	ColorSequenceKeypoint.new(0.8, Color3.fromRGB(20, 15, 5)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 5, 20))
+})
+flashGradient.Enabled = true
+flashGradient.Parent = flashFrame
+
+local loadLabel = Instance.new("TextLabel")
+loadLabel.BackgroundTransparency = 1
+loadLabel.Position = UDim2.new(0, 0, 0, 0)
+loadLabel.Size = UDim2.new(1, 0, 1, 0)
+loadLabel.Font = Enum.Font.FredokaOne
+loadLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadLabel.TextSize = 38
+loadLabel.Text = "LOADING SYSTEM..."
+loadLabel.TextTransparency = 1
+loadLabel.Parent = flashFrame
+
+local loadStroke = Instance.new("UIStroke")
+loadStroke.Thickness = 2
+loadStroke.Color = Color3.fromRGB(0, 0, 0)
+loadStroke.Transparency = 1
+loadStroke.Parent = loadLabel
+
+local hubFrame = Instance.new("Frame")
+hubFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+hubFrame.BorderSizePixel = 0
+hubFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+hubFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+hubFrame.Size = UDim2.new(0, 0, 0, 0)
+hubFrame.ClipsDescendants = true
+hubFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 14)
+uiCorner.Parent = hubFrame
+
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Thickness = 3
+uiStroke.Color = Color3.fromRGB(255, 255, 255)
+uiStroke.Parent = hubFrame
+
+local uiGradient = Instance.new("UIGradient")
+uiGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(40, 40, 40)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+})
+uiGradient.Parent = uiStroke
+
+task.spawn(function()
+	while true do
+		TweenService:Create(uiGradient, TweenInfo.new(3, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
+		TweenService:Create(flashGradient, TweenInfo.new(4, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
+		task.wait(3)
+	end
+end)
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.BackgroundTransparency = 1
+titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
+titleLabel.Font = Enum.Font.FredokaOne
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 32
+titleLabel.Text = ""
+titleLabel.Parent = hubFrame
+
+local welcomeLabel = Instance.new("TextLabel")
+welcomeLabel.BackgroundTransparency = 1
+welcomeLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+welcomeLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+welcomeLabel.Size = UDim2.new(0, 0, 0, 0)
+welcomeLabel.Font = Enum.Font.FredokaOne
+welcomeLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+welcomeLabel.TextScaled = true
+welcomeLabel.Text = "Welcome, " .. localPlayer.DisplayName
+welcomeLabel.Parent = hubFrame
+
+local keyTextBox = Instance.new("TextBox")
+keyTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+keyTextBox.AnchorPoint = Vector2.new(0.5, 0.5)
+keyTextBox.Position = UDim2.new(0.5, 0, 0.52, 0)
+keyTextBox.Size = UDim2.new(0, 0, 0, 0)
+keyTextBox.Font = Enum.Font.FredokaOne
+keyTextBox.Text = ""
+keyTextBox.PlaceholderText = "Enter Activation Key..."
+keyTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyTextBox.TextSize = 16
+keyTextBox.Visible = false
+keyTextBox.Parent = hubFrame
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 8)
+boxCorner.Parent = keyTextBox
+
+local boxStroke = Instance.new("UIStroke")
+boxStroke.Thickness = 1.5
+boxStroke.Color = Color3.fromRGB(60, 60, 60)
+boxStroke.Parent = keyTextBox
+
+local verifyButton = Instance.new("TextButton")
+verifyButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+verifyButton.AnchorPoint = Vector2.new(0.5, 0.5)
+verifyButton.Position = UDim2.new(0.5, 0, 0.82, 0)
+verifyButton.Size = UDim2.new(0, 0, 0, 0)
+verifyButton.Font = Enum.Font.FredokaOne
+verifyButton.Text = "Verify Key"
+verifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+verifyButton.TextSize = 16
+verifyButton.Visible = false
+verifyButton.Parent = hubFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.Parent = verifyButton
+
+local infoSlowLines = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local infoNormal = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+local infoSmooth = TweenInfo.new(0.7, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+
+local errorPhrases = {
+	"Access Denied!",
+	"Incorrect Key!",
+	"Wrong Key!",
+	"Invalid! Try Again!",
+	"Nope! Incorrect!"
+}
+
+_G.KeyVerified = false
+
+task.spawn(function()
+	task.wait(1)
+
+	local t1 = TweenService:Create(lineLeft, infoSlowLines, {Position = UDim2.new(0, 0, 0.5, -2)})
+	local t2 = TweenService:Create(lineRight, infoSlowLines, {Position = UDim2.new(0.5, 0, 0.5, -2)})
+	t1:Play() t2:Play()
+	t1.Completed:Wait()
+
+	local t3 = TweenService:Create(flashFrame, infoFast, {Size = UDim2.new(1, 0, 1, 0)})
+	t3:Play()
+	t3.Completed:Wait()
+	
+	TweenService:Create(loadLabel, infoFast, {TextTransparency = 0}):Play()
+	TweenService:Create(loadStroke, infoFast, {Transparency = 0}):Play()
+	
+	task.wait(3.5)
+
+	TweenService:Create(loadLabel, infoFast, {TextTransparency = 1}):Play()
+	TweenService:Create(loadStroke, infoFast, {Transparency = 1}):Play()
+	local t4 = TweenService:Create(flashFrame, infoFast, {Size = UDim2.new(0, 0, 0, 0)})
+	t4:Play()
+	t4.Completed:Wait()
+
+	local t5 = TweenService:Create(lineLeft, infoFast, {Position = UDim2.new(-0.5, 0, 0.5, -2)})
+	local t6 = TweenService:Create(lineRight, infoFast, {Position = UDim2.new(1, 0, 0.5, -2)})
+	t5:Play() t6:Play()
+	t5.Completed:Wait()
+
+	local t7 = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 360, 0, 70)})
+	t7:Play()
+	t7.Completed:Wait()
+
+	local fullText = "⁐ Sanx | Hub ⁐"
+	for i = 1, #fullText do
+		titleLabel.Text = string.sub(fullText, 1, i)
+		task.wait(0.04)
+	end
+	task.wait(0.5)
+
+	local t8 = TweenService:Create(hubFrame, infoSmooth, {Size = UDim2.new(0, 380, 0, 160)})
+	local t9 = TweenService:Create(titleLabel, infoSmooth, {Position = UDim2.new(0.5, 0, 0.22, 0)})
+	local t10 = TweenService:Create(welcomeLabel, infoSmooth, {Size = UDim2.new(0.8, 0, 0.2, 0), Position = UDim2.new(0.5, 0, 0.65, 0)})
+	t8:Play() t9:Play() t10:Play()
+	t8.Completed:Wait()
+
+	task.wait(2.5)
+
+	local tShrinkWelcome = TweenService:Create(welcomeLabel, infoFast, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
+	tShrinkWelcome:Play()
+	tShrinkWelcome.Completed:Wait()
+
+	TweenService:Create(titleLabel, infoFast, {TextTransparency = 1}):Play()
+	task.wait(0.2)
+	titleLabel.Text = "⁐ Key System ⁐"
+	TweenService:Create(titleLabel, infoFast, {TextTransparency = 0}):Play()
+
+	keyTextBox.Visible = true
