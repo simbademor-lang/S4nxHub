@@ -1,3 +1,5 @@
+_G.KeyVerified = false
+
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
@@ -168,8 +170,6 @@ local errorPhrases = {
 	"Nope! Incorrect!"
 }
 
-_G.KeyVerified = false
-
 task.spawn(function()
 	task.wait(1)
 
@@ -227,3 +227,82 @@ task.spawn(function()
 	TweenService:Create(titleLabel, infoFast, {TextTransparency = 0}):Play()
 
 	keyTextBox.Visible = true
+	verifyButton.Visible = true
+
+	local tShowBox = TweenService:Create(keyTextBox, infoFast, {Size = UDim2.new(0.8, 0, 0.2, 0)})
+	local tShowBtn = TweenService:Create(verifyButton, infoFast, {Size = UDim2.new(0.5, 0, 0.2, 0)})
+	tShowBox:Play() tShowBtn:Play()
+
+	local isVerifying = false
+
+	verifyButton.MouseButton1Click:Connect(function()
+		if isVerifying then return end
+		isVerifying = true
+
+		local inputKey = keyTextBox.Text
+		local success, targetKey = pcall(function()
+			return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
+		end)
+
+		local keyMatches = false
+		if success and targetKey then
+			targetKey = string.gsub(targetKey, "%s+", "")
+			inputKey = string.gsub(inputKey, "%s+", "")
+			if inputKey == targetKey then
+				keyMatches = true
+			end
+		end
+
+		if keyMatches then
+			_G.KeyVerified = true
+
+			local tCloseKeys = TweenService:Create(keyTextBox, infoFast, {Size = UDim2.new(0, 0, 0, 0)})
+			TweenService:Create(verifyButton, infoFast, {Size = UDim2.new(0, 0, 0, 0)}):Play()
+			tCloseKeys:Play()
+			tCloseKeys.Completed:Wait()
+
+			keyTextBox.Visible = false
+			verifyButton.Visible = false
+
+			TweenService:Create(titleLabel, infoFast, {TextTransparency = 1}):Play()
+			task.wait(0.2)
+			titleLabel.Text = "⁐ Sanx | Hub ⁐"
+			TweenService:Create(titleLabel, infoFast, {TextTransparency = 0, Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+
+			local tSizeDown = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 360, 0, 70)})
+			tSizeDown:Play()
+			tSizeDown.Completed:Wait()
+
+			for i = #titleLabel.Text, 0, -1 do
+				titleLabel.Text = string.sub(titleLabel.Text, 1, i)
+				task.wait(0.03)
+			end
+
+			local tFinal = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 0, 0, 0)})
+			tFinal:Play()
+			tFinal.Completed:Wait()
+
+			screenGui:Destroy()
+		else
+			keyTextBox.Text = ""
+			local errorMsg = errorPhrases[math.random(1, #errorPhrases)]
+
+			TweenService:Create(titleLabel, infoFast, {TextColor3 = Color3.fromRGB(255, 60, 60)}):Play()
+			titleLabel.Text = errorMsg
+
+			local currentPos = UDim2.new(0.5, 0, 0.5, 0)
+			for offset = 1, 6 do
+				hubFrame.Position = currentPos + UDim2.new(0, (offset % 2 == 0 and 10 or -10), 0, 0)
+				task.wait(0.04)
+			end
+			hubFrame.Position = currentPos
+
+			task.wait(1.2)
+			TweenService:Create(titleLabel, infoFast, {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+			titleLabel.Text = "⁐ Key System ⁐"
+			isVerifying = false
+		end
+	end)
+end)
+
+repeat task.wait(0.5) until _G.KeyVerified
