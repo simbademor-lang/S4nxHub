@@ -1,308 +1,328 @@
 _G.KeyVerified = false
 
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 local localPlayer = Players.LocalPlayer
-local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+-- Защита от обнаружения (CoreGui, если инжектор позволяет, иначе PlayerGui)
+local guiParent = pcall(function() return CoreGui.Name end) and CoreGui or localPlayer:WaitForChild("PlayerGui")
+
+-- Очистка старых GUI
+if guiParent:FindFirstChild("S4nxHub_Ultra") then
+	guiParent.S4nxHub_Ultra:Destroy()
+end
 
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "SanxIntroGui_Clean"
+screenGui.Name = "S4nxHub_Ultra"
 screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+screenGui.Parent = guiParent
 
-local lineLeft = Instance.new("Frame")
-lineLeft.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+-- === ПАРАМЕТРЫ АНИМАЦИИ ===
+local infoFast = TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+local infoSmooth = TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+local infoBounce = TweenInfo.new(1, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+
+-- === ФАЗА 1: ЛИНИИ И ПАДАЮЩИЕ СМАЙЛЫ ===
+local introFrame = Instance.new("Frame", screenGui)
+introFrame.Size = UDim2.new(1, 0, 1, 0)
+introFrame.BackgroundTransparency = 1
+
+local lineLeft = Instance.new("Frame", introFrame)
+lineLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 lineLeft.BorderSizePixel = 0
 lineLeft.Position = UDim2.new(-0.5, 0, 0.5, -2)
-lineLeft.Size = UDim2.new(0.5, 0, 0, 4)
-lineLeft.Parent = screenGui
+lineLeft.Size = UDim2.new(0.5, 0, 0, 2)
 
-local lineRight = Instance.new("Frame")
-lineRight.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+local lineRight = Instance.new("Frame", introFrame)
+lineRight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 lineRight.BorderSizePixel = 0
 lineRight.Position = UDim2.new(1, 0, 0.5, -2)
-lineRight.Size = UDim2.new(0.5, 0, 0, 4)
-lineRight.Parent = screenGui
+lineRight.Size = UDim2.new(0.5, 0, 0, 2)
 
-local flashFrame = Instance.new("Frame")
-flashFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-flashFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-flashFrame.Size = UDim2.new(0, 0, 0, 0)
-flashFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-flashFrame.BorderSizePixel = 0
-flashFrame.ClipsDescendants = true
-flashFrame.Parent = screenGui
+TweenService:Create(lineLeft, infoSmooth, {Position = UDim2.new(0, 0, 0.5, -2)}):Play()
+local tLineRight = TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(0.5, 0, 0.5, -2)})
+tLineRight:Play()
+tLineRight.Completed:Wait()
 
-local flashGradient = Instance.new("UIGradient")
-flashGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 5, 20)),
-	ColorSequenceKeypoint.new(0.2, Color3.fromRGB(20, 5, 12)),
-	ColorSequenceKeypoint.new(0.4, Color3.fromRGB(5, 12, 20)),
-	ColorSequenceKeypoint.new(0.6, Color3.fromRGB(5, 20, 10)),
-	ColorSequenceKeypoint.new(0.8, Color3.fromRGB(20, 15, 5)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 5, 20))
+local emojis = {"✨", "💫", "🚀", "🪐", "⚡"}
+for i = 1, 30 do
+	local emoji = Instance.new("TextLabel", introFrame)
+	emoji.BackgroundTransparency = 1
+	emoji.Text = emojis[math.random(1, #emojis)]
+	emoji.TextSize = math.random(20, 45)
+	emoji.Position = UDim2.new(math.random(20, 80)/100, 0, -0.2, 0)
+	emoji.Rotation = math.random(-180, 180)
+	
+	local dropTime = math.random(10, 25) / 10
+	TweenService:Create(emoji, TweenInfo.new(dropTime, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {
+		Position = UDim2.new(emoji.Position.X.Scale, 0, 1.2, 0),
+		Rotation = emoji.Rotation + math.random(180, 360)
+	}):Play()
+	task.wait(0.05)
+end
+
+task.wait(0.5)
+TweenService:Create(lineLeft, infoFast, {Position = UDim2.new(-0.5, 0, 0.5, -2)}):Play()
+TweenService:Create(lineRight, infoFast, {Position = UDim2.new(1, 0, 0.5, -2)}):Play()
+task.wait(0.4)
+introFrame:Destroy()
+
+-- === ФАЗА 2: СБОРКА БУКВ И ГЛАВНЫЙ ИНТЕРФЕЙС ===
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+mainFrame.Size = UDim2.new(0, 0, 0, 0) -- Начнем с нуля
+mainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 14)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+
+local mainCorner = Instance.new("UICorner", mainFrame)
+mainCorner.CornerRadius = UDim.new(0, 12)
+
+local mainStroke = Instance.new("UIStroke", mainFrame)
+mainStroke.Thickness = 2
+mainStroke.Color = Color3.fromRGB(255, 255, 255)
+
+local strokeGradient = Instance.new("UIGradient", mainStroke)
+strokeGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 80, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 80, 255))
 })
-flashGradient.Enabled = true
-flashGradient.Parent = flashFrame
 
-local loadLabel = Instance.new("TextLabel")
-loadLabel.BackgroundTransparency = 1
-loadLabel.Position = UDim2.new(0, 0, 0, 0)
-loadLabel.Size = UDim2.new(1, 0, 1, 0)
-loadLabel.Font = Enum.Font.FredokaOne
-loadLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-loadLabel.TextSize = 38
-loadLabel.Text = "LOADING SYSTEM..."
-loadLabel.TextTransparency = 1
-loadLabel.Parent = flashFrame
+-- Анимация контура
+RunService.RenderStepped:Connect(function()
+	strokeGradient.Rotation = (strokeGradient.Rotation + 1) % 360
+end)
 
-local loadStroke = Instance.new("UIStroke")
-loadStroke.Thickness = 2
-loadStroke.Color = Color3.fromRGB(0, 0, 0)
-loadStroke.Transparency = 1
-loadStroke.Parent = loadLabel
+-- Фон с цифрами и ДНК (0, 1, точки)
+local bgNodes = Instance.new("Folder", mainFrame)
+local nodes = {}
+for i = 1, 25 do
+	local node = Instance.new("TextLabel", mainFrame)
+	node.BackgroundTransparency = 1
+	node.Text = (math.random(1, 2) == 1) and "0" or (math.random(1, 2) == 1 and "1" or ".")
+	node.TextColor3 = Color3.fromRGB(60, 60, 80)
+	node.TextSize = math.random(10, 18)
+	node.Position = UDim2.new(math.random(0, 100)/100, 0, math.random(0, 100)/100, 0)
+	table.insert(nodes, {element = node, speedX = math.random(-10, 10)/10000, speedY = math.random(-10, 10)/10000})
+end
 
-local hubFrame = Instance.new("Frame")
-hubFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-hubFrame.BorderSizePixel = 0
-hubFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-hubFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-hubFrame.Size = UDim2.new(0, 0, 0, 0)
-hubFrame.ClipsDescendants = true
-hubFrame.Parent = screenGui
-
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 14)
-uiCorner.Parent = hubFrame
-
-local uiStroke = Instance.new("UIStroke")
-uiStroke.Thickness = 3
-uiStroke.Color = Color3.fromRGB(255, 255, 255)
-uiStroke.Parent = hubFrame
-
-local uiGradient = Instance.new("UIGradient")
-uiGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(40, 40, 40)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
-})
-uiGradient.Parent = uiStroke
-
-task.spawn(function()
-	while true do
-		TweenService:Create(uiGradient, TweenInfo.new(3, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
-		TweenService:Create(flashGradient, TweenInfo.new(4, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
-		task.wait(3)
+RunService.RenderStepped:Connect(function()
+	for _, n in pairs(nodes) do
+		local curX = n.element.Position.X.Scale
+		local curY = n.element.Position.Y.Scale
+		if curX < 0 or curX > 1 then n.speedX = -n.speedX end
+		if curY < 0 or curY > 1 then n.speedY = -n.speedY end
+		n.element.Position = UDim2.new(curX + n.speedX, 0, curY + n.speedY, 0)
 	end
 end)
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.BackgroundTransparency = 1
-titleLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-titleLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
-titleLabel.Font = Enum.Font.FredokaOne
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextSize = 32
-titleLabel.Text = ""
-titleLabel.Parent = hubFrame
+-- Раскрываем фрейм
+TweenService:Create(mainFrame, infoSmooth, {Size = UDim2.new(0, 420, 0, 240)}):Play()
+task.wait(0.5)
 
-local welcomeLabel = Instance.new("TextLabel")
+-- Анимация сборки букв S4nx Hub
+local titleWord = "S4nx Hub"
+local letters = {}
+local letterContainer = Instance.new("Frame", mainFrame)
+letterContainer.Size = UDim2.new(1, 0, 0.3, 0)
+letterContainer.BackgroundTransparency = 1
+letterContainer.Position = UDim2.new(0, 0, 0.1, 0)
+
+local startX = 0.25
+local spacing = 0.07
+
+for i = 1, #titleWord do
+	local char = string.sub(titleWord, i, i)
+	local l = Instance.new("TextLabel", letterContainer)
+	l.BackgroundTransparency = 1
+	l.Text = char
+	l.Font = Enum.Font.Roboto
+	l.RichText = true
+	l.Text = "<b>" .. char .. "</b>"
+	l.TextColor3 = Color3.fromRGB(255, 255, 255)
+	l.TextSize = 34
+	-- Падают с неба случайным образом
+	l.Position = UDim2.new(math.random(10, 90)/100, 0, -2, 0)
+	l.Rotation = math.random(-360, 360)
+	l.Size = UDim2.new(0, 30, 1, 0)
+	
+	TweenService:Create(l, infoBounce, {
+		Position = UDim2.new(startX + (i-1)*spacing, 0, 0, 0),
+		Rotation = 0
+	}):Play()
+	task.wait(0.08)
+	table.insert(letters, l)
+end
+
+task.wait(1)
+
+-- Текст приветствия
+local welcomeLabel = Instance.new("TextLabel", mainFrame)
 welcomeLabel.BackgroundTransparency = 1
-welcomeLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-welcomeLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-welcomeLabel.Size = UDim2.new(0, 0, 0, 0)
-welcomeLabel.Font = Enum.Font.FredokaOne
-welcomeLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-welcomeLabel.TextScaled = true
-welcomeLabel.Text = "Welcome, " .. localPlayer.DisplayName
-welcomeLabel.Parent = hubFrame
+welcomeLabel.Position = UDim2.new(0, 0, 0.4, 0)
+welcomeLabel.Size = UDim2.new(1, 0, 0.15, 0)
+welcomeLabel.Font = Enum.Font.Roboto
+welcomeLabel.RichText = true
+welcomeLabel.Text = "<b>Welcome, <font color='#A0A0FF'>" .. localPlayer.DisplayName .. "</font>. Thanks for using.</b>"
+welcomeLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+welcomeLabel.TextSize = 18
+welcomeLabel.TextTransparency = 1
 
-local keyTextBox = Instance.new("TextBox")
-keyTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-keyTextBox.AnchorPoint = Vector2.new(0.5, 0.5)
-keyTextBox.Position = UDim2.new(0.5, 0, 0.52, 0)
-keyTextBox.Size = UDim2.new(0, 0, 0, 0)
-keyTextBox.Font = Enum.Font.FredokaOne
-keyTextBox.Text = ""
-keyTextBox.PlaceholderText = "Enter Activation Key..."
-keyTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-keyTextBox.TextSize = 16
-keyTextBox.Visible = false
-keyTextBox.Parent = hubFrame
+TweenService:Create(welcomeLabel, infoFast, {TextTransparency = 0}):Play()
 
-local boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 8)
-boxCorner.Parent = keyTextBox
+-- === ЭЛЕМЕНТЫ КЛЮЧА ===
+local keyInput = Instance.new("TextBox", mainFrame)
+keyInput.Size = UDim2.new(0.65, 0, 0, 40)
+keyInput.Position = UDim2.new(0.5, 0, 0.65, 0)
+keyInput.AnchorPoint = Vector2.new(0.5, 0.5)
+keyInput.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+keyInput.Font = Enum.Font.Roboto
+keyInput.Text = ""
+keyInput.PlaceholderText = "🔑 Enter Key Here..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.TextSize = 16
+keyInput.TextTransparency = 1
+keyInput.BackgroundTransparency = 1
 
-local boxStroke = Instance.new("UIStroke")
-boxStroke.Thickness = 1.5
-boxStroke.Color = Color3.fromRGB(60, 60, 60)
-boxStroke.Parent = keyTextBox
+local inputCorner = Instance.new("UICorner", keyInput)
+inputCorner.CornerRadius = UDim.new(0, 8)
 
-local verifyButton = Instance.new("TextButton")
-verifyButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-verifyButton.AnchorPoint = Vector2.new(0.5, 0.5)
-verifyButton.Position = UDim2.new(0.5, 0, 0.82, 0)
-verifyButton.Size = UDim2.new(0, 0, 0, 0)
-verifyButton.Font = Enum.Font.FredokaOne
-verifyButton.Text = "Verify Key"
-verifyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-verifyButton.TextSize = 16
-verifyButton.Visible = false
-verifyButton.Parent = hubFrame
+local inputStroke = Instance.new("UIStroke", keyInput)
+inputStroke.Color = Color3.fromRGB(80, 80, 100)
+inputStroke.Thickness = 1.5
+inputStroke.Transparency = 1
 
-local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 8)
-btnCorner.Parent = verifyButton
+local btnContainer = Instance.new("Frame", mainFrame)
+btnContainer.Size = UDim2.new(0.65, 0, 0, 40)
+btnContainer.Position = UDim2.new(0.5, 0, 0.85, 0)
+btnContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+btnContainer.BackgroundTransparency = 1
 
-local infoSlowLines = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local infoNormal = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-local infoSmooth = TweenInfo.new(0.7, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+local verifyBtn = Instance.new("TextButton", btnContainer)
+verifyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+verifyBtn.Position = UDim2.new(0, 0, 0, 0)
+verifyBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+verifyBtn.Font = Enum.Font.Roboto
+verifyBtn.Text = "<b>Verify</b>"
+verifyBtn.RichText = true
+verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+verifyBtn.TextSize = 16
+verifyBtn.TextTransparency = 1
+verifyBtn.BackgroundTransparency = 1
+Instance.new("UICorner", verifyBtn).CornerRadius = UDim.new(0, 6)
 
-local errorPhrases = {
-	"Access Denied!",
-	"Incorrect Key!",
-	"Wrong Key!",
-	"Invalid! Try Again!",
-	"Nope! Incorrect!"
-}
+local getKeyBtn = Instance.new("TextButton", btnContainer)
+getKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+getKeyBtn.Position = UDim2.new(0.52, 0, 0, 0)
+getKeyBtn.BackgroundColor3 = Color3.fromRGB(40, 30, 30)
+getKeyBtn.Font = Enum.Font.Roboto
+getKeyBtn.Text = "<b>Get Key</b>"
+getKeyBtn.RichText = true
+getKeyBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+getKeyBtn.TextSize = 16
+getKeyBtn.TextTransparency = 1
+getKeyBtn.BackgroundTransparency = 1
+Instance.new("UICorner", getKeyBtn).CornerRadius = UDim.new(0, 6)
 
-task.spawn(function()
-	task.wait(1)
+-- Появление элементов
+TweenService:Create(keyInput, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+TweenService:Create(inputStroke, infoSmooth, {Transparency = 0}):Play()
+TweenService:Create(verifyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+TweenService:Create(getKeyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
 
-	local t1 = TweenService:Create(lineLeft, infoSlowLines, {Position = UDim2.new(0, 0, 0.5, -2)})
-	local t2 = TweenService:Create(lineRight, infoSlowLines, {Position = UDim2.new(0.5, 0, 0.5, -2)})
-	t1:Play() t2:Play()
-	t1.Completed:Wait()
+-- === ПОПАП ДЛЯ ПОЛУЧЕНИЯ КЛЮЧА ===
+local popupFrame = Instance.new("Frame", screenGui)
+popupFrame.Size = UDim2.new(0, 300, 0, 120)
+popupFrame.Position = UDim2.new(0.5, 0, 1.5, 0) -- За экраном
+popupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+popupFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+popupFrame.BorderSizePixel = 0
+Instance.new("UICorner", popupFrame).CornerRadius = UDim.new(0, 10)
+local popupStroke = Instance.new("UIStroke", popupFrame)
+popupStroke.Color = Color3.fromRGB(100, 100, 255)
+popupStroke.Thickness = 2
 
-	local t3 = TweenService:Create(flashFrame, infoFast, {Size = UDim2.new(1, 0, 1, 0)})
-	t3:Play()
-	t3.Completed:Wait()
-	
-	TweenService:Create(loadLabel, infoFast, {TextTransparency = 0}):Play()
-	TweenService:Create(loadStroke, infoFast, {Transparency = 0}):Play()
-	
-	task.wait(3.5)
+local popupText = Instance.new("TextLabel", popupFrame)
+popupText.Size = UDim2.new(1, 0, 0.5, 0)
+popupText.BackgroundTransparency = 1
+popupText.Font = Enum.Font.Roboto
+popupText.Text = "<b>Link Copied!</b>\nPaste it in your browser."
+popupText.RichText = true
+popupText.TextColor3 = Color3.fromRGB(255, 255, 255)
+popupText.TextSize = 18
 
-	TweenService:Create(loadLabel, infoFast, {TextTransparency = 1}):Play()
-	TweenService:Create(loadStroke, infoFast, {Transparency = 1}):Play()
-	local t4 = TweenService:Create(flashFrame, infoFast, {Size = UDim2.new(0, 0, 0, 0)})
-	t4:Play()
-	t4.Completed:Wait()
+local closePopup = Instance.new("TextButton", popupFrame)
+closePopup.Size = UDim2.new(0, 30, 0, 30)
+closePopup.Position = UDim2.new(1, -10, 0, 10)
+closePopup.AnchorPoint = Vector2.new(1, 0)
+closePopup.BackgroundTransparency = 1
+closePopup.Font = Enum.Font.Roboto
+closePopup.Text = "<b>X</b>"
+closePopup.RichText = true
+closePopup.TextColor3 = Color3.fromRGB(255, 80, 80)
+closePopup.TextSize = 20
 
-	local t5 = TweenService:Create(lineLeft, infoFast, {Position = UDim2.new(-0.5, 0, 0.5, -2)})
-	local t6 = TweenService:Create(lineRight, infoFast, {Position = UDim2.new(1, 0, 0.5, -2)})
-	t5:Play() t6:Play()
-	t5.Completed:Wait()
+getKeyBtn.MouseButton1Click:Connect(function()
+	pcall(function() setclipboard("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y") end)
+	TweenService:Create(popupFrame, infoSmooth, {Position = UDim2.new(0.5, 0, 0.8, 0)}):Play()
+end)
 
-	local t7 = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 360, 0, 70)})
-	t7:Play()
-	t7.Completed:Wait()
+closePopup.MouseButton1Click:Connect(function()
+	TweenService:Create(popupFrame, infoSmooth, {Position = UDim2.new(0.5, 0, 1.5, 0)}):Play()
+end)
 
-	local fullText = "⁐ Sanx | Hub ⁐"
-	for i = 1, #fullText do
-		titleLabel.Text = string.sub(fullText, 1, i)
-		task.wait(0.04)
-	end
-	task.wait(0.5)
+-- === ЛОГИКА ПРОВЕРКИ ===
+local isVerifying = false
 
-	local t8 = TweenService:Create(hubFrame, infoSmooth, {Size = UDim2.new(0, 380, 0, 160)})
-	local t9 = TweenService:Create(titleLabel, infoSmooth, {Position = UDim2.new(0.5, 0, 0.22, 0)})
-	local t10 = TweenService:Create(welcomeLabel, infoSmooth, {Size = UDim2.new(0.8, 0, 0.2, 0), Position = UDim2.new(0.5, 0, 0.65, 0)})
-	t8:Play() t9:Play() t10:Play()
-	t8.Completed:Wait()
+verifyBtn.MouseButton1Click:Connect(function()
+	if isVerifying then return end
+	isVerifying = true
+	verifyBtn.Text = "<b>...</b>"
 
-	task.wait(2.5)
-
-	local tShrinkWelcome = TweenService:Create(welcomeLabel, infoFast, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-	tShrinkWelcome:Play()
-	tShrinkWelcome.Completed:Wait()
-
-	TweenService:Create(titleLabel, infoFast, {TextTransparency = 1}):Play()
-	task.wait(0.2)
-	titleLabel.Text = "⁐ Key System ⁐"
-	TweenService:Create(titleLabel, infoFast, {TextTransparency = 0}):Play()
-
-	keyTextBox.Visible = true
-	verifyButton.Visible = true
-
-	local tShowBox = TweenService:Create(keyTextBox, infoFast, {Size = UDim2.new(0.8, 0, 0.2, 0)})
-	local tShowBtn = TweenService:Create(verifyButton, infoFast, {Size = UDim2.new(0.5, 0, 0.2, 0)})
-	tShowBox:Play() tShowBtn:Play()
-
-	local isVerifying = false
-
-	verifyButton.MouseButton1Click:Connect(function()
-		if isVerifying then return end
-		isVerifying = true
-
-		local inputKey = keyTextBox.Text
-		local success, targetKey = pcall(function()
-			return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
-		end)
-
-		local keyMatches = false
-		if success and targetKey then
-			targetKey = string.gsub(targetKey, "%s+", "")
-			inputKey = string.gsub(inputKey, "%s+", "")
-			if inputKey == targetKey then
-				keyMatches = true
-			end
-		end
-
-		if keyMatches then
-			_G.KeyVerified = true
-
-			local tCloseKeys = TweenService:Create(keyTextBox, infoFast, {Size = UDim2.new(0, 0, 0, 0)})
-			TweenService:Create(verifyButton, infoFast, {Size = UDim2.new(0, 0, 0, 0)}):Play()
-			tCloseKeys:Play()
-			tCloseKeys.Completed:Wait()
-
-			keyTextBox.Visible = false
-			verifyButton.Visible = false
-
-			TweenService:Create(titleLabel, infoFast, {TextTransparency = 1}):Play()
-			task.wait(0.2)
-			titleLabel.Text = "⁐ Sanx | Hub ⁐"
-			TweenService:Create(titleLabel, infoFast, {TextTransparency = 0, Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
-
-			local tSizeDown = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 360, 0, 70)})
-			tSizeDown:Play()
-			tSizeDown.Completed:Wait()
-
-			for i = #titleLabel.Text, 0, -1 do
-				titleLabel.Text = string.sub(titleLabel.Text, 1, i)
-				task.wait(0.03)
-			end
-
-			local tFinal = TweenService:Create(hubFrame, infoNormal, {Size = UDim2.new(0, 0, 0, 0)})
-			tFinal:Play()
-			tFinal.Completed:Wait()
-
-			screenGui:Destroy()
-		else
-			keyTextBox.Text = ""
-			local errorMsg = errorPhrases[math.random(1, #errorPhrases)]
-
-			TweenService:Create(titleLabel, infoFast, {TextColor3 = Color3.fromRGB(255, 60, 60)}):Play()
-			titleLabel.Text = errorMsg
-
-			local currentPos = UDim2.new(0.5, 0, 0.5, 0)
-			for offset = 1, 6 do
-				hubFrame.Position = currentPos + UDim2.new(0, (offset % 2 == 0 and 10 or -10), 0, 0)
-				task.wait(0.04)
-			end
-			hubFrame.Position = currentPos
-
-			task.wait(1.2)
-			TweenService:Create(titleLabel, infoFast, {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-			titleLabel.Text = "⁐ Key System ⁐"
-			isVerifying = false
-		end
+	local inputKey = keyInput.Text
+	local success, targetKey = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
 	end)
+
+	local keyMatches = false
+	if success and targetKey then
+		targetKey = string.gsub(targetKey, "%s+", "")
+		inputKey = string.gsub(inputKey, "%s+", "")
+		if inputKey == targetKey then keyMatches = true end
+	end
+
+	if keyMatches then
+		_G.KeyVerified = true
+		verifyBtn.Text = "<b><font color='#80FF80'>Success</font></b>"
+		task.wait(1)
+		
+		-- Эпичное закрытие
+		TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+			Size = UDim2.new(0, 0, 0, 0),
+			Rotation = 45
+		}):Play()
+		task.wait(0.6)
+		screenGui:Destroy()
+	else
+		verifyBtn.Text = "<b><font color='#FF4040'>Wrong Key!</font></b>"
+		
+		-- Тряска (Shake Effect)
+		local origPos = mainFrame.Position
+		for i = 1, 6 do
+			mainFrame.Position = origPos + UDim2.new(0, (i%2==0 and 15 or -15), 0, 0)
+			task.wait(0.04)
+		end
+		mainFrame.Position = origPos
+		
+		task.wait(1)
+		verifyBtn.Text = "<b>Verify</b>"
+		isVerifying = false
+	end
 end)
 
 repeat task.wait(0.5) until _G.KeyVerified
