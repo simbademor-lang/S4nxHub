@@ -33,7 +33,7 @@ errorSound.SoundId = "rbxassetid://131661013076677"
 errorSound.Volume = 1
 
 local bgMusic = Instance.new("Sound", soundFolder)
-bgMusic.SoundId = "rbxassetid://1848354536"
+bgMusic.SoundId = "rbxassetid://140449815647953" -- ТУТ_АЙДИ_МУЗЫКИ
 bgMusic.Volume = 0
 bgMusic.Looped = true
 bgMusic:Play()
@@ -48,9 +48,8 @@ screenGui.Parent = guiParent
 
 local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 local infoSmooth = TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-local infoBounce = TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
 
--- === ФАЗА 1: ЛИНИИ И ЛЕТНИЕ СМАЙЛЫ ===
+-- === ФАЗА 1: ЛИНИИ (Загрузка) И ЛЕТНИЕ СМАЙЛЫ ===
 local introFrame = Instance.new("Frame", screenGui)
 introFrame.Size = UDim2.new(1, 0, 1, 0)
 introFrame.BackgroundTransparency = 1
@@ -67,9 +66,23 @@ lineRight.BorderSizePixel = 0
 lineRight.Position = UDim2.new(1, 0, 0.5, -1)
 lineRight.Size = UDim2.new(0.5, 0, 0, 2)
 
-TweenService:Create(lineLeft, infoSmooth, {Position = UDim2.new(0, 0, 0.5, -1)}):Play()
-TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(0.5, 0, 0.5, -1)}):Play()
+-- Рандомная загрузка линий (около 4-5 сек)
+local totalLoadTime = 0
+while totalLoadTime < 4 do
+	local stepWait = math.random(5, 12) / 10
+	totalLoadTime = totalLoadTime + stepWait
+	local progress = math.min(1, totalLoadTime / 4.5)
+	
+	TweenService:Create(lineLeft, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(-0.5 + (0.5 * progress), 0, 0.5, -1)}):Play()
+	TweenService:Create(lineRight, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(1 - (0.5 * progress), 0, 0.5, -1)}):Play()
+	task.wait(stepWait + math.random(1, 4)/10) -- Рандомные паузы
+end
 
+TweenService:Create(lineLeft, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0.5, -1)}):Play()
+TweenService:Create(lineRight, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 0.5, -1)}):Play()
+task.wait(0.5)
+
+-- Спавн смайлов ПОСЛЕ загрузки линий
 local summerEmojis = {"☀️", "🌴", "🍉", "🌊", "🍹", "🍧"}
 for i = 1, 25 do
 	local emoji = Instance.new("TextLabel", introFrame)
@@ -86,10 +99,12 @@ for i = 1, 25 do
 	task.wait(0.02)
 end
 
-task.wait(0.6)
-TweenService:Create(lineLeft, infoFast, {Position = UDim2.new(-0.5, 0, 0.5, -1)}):Play()
-TweenService:Create(lineRight, infoFast, {Position = UDim2.new(1, 0, 0.5, -1)}):Play()
-task.wait(0.5)
+task.wait(1.5)
+
+-- Линии уходят обратно откуда пришли
+TweenService:Create(lineLeft, infoSmooth, {Position = UDim2.new(-0.5, 0, 0.5, -1)}):Play()
+TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(1, 0, 0.5, -1)}):Play()
+task.wait(0.8)
 introFrame:Destroy()
 
 -- === ФАЗА 2: ГЛАВНЫЙ ИНТЕРФЕЙС И ДНК ФОН ===
@@ -360,11 +375,52 @@ verifyBtn.MouseButton1Click:Connect(function()
 		task.wait(0.8)
 		screenGui:Destroy()
 		
+		-- === АНИМАЦИЯ ЗАМКА И ТРЯСКА КАМЕРЫ ===
+		local lockGui = Instance.new("ScreenGui", guiParent)
+		lockGui.IgnoreGuiInset = true
+		
+		local lockIcon = Instance.new("TextLabel", lockGui)
+		lockIcon.BackgroundTransparency = 1
+		lockIcon.Size = UDim2.new(0, 100, 0, 100)
+		lockIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+		lockIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+		lockIcon.Text = "🔒"
+		lockIcon.TextSize = 0
+		lockIcon.TextTransparency = 1
+		
+		TweenService:Create(lockIcon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {TextSize = 80, TextTransparency = 0}):Play()
+		task.wait(0.8)
+		
+		lockIcon.Text = "🔓"
+		TweenService:Create(lockIcon, TweenInfo.new(0.3, Enum.EasingStyle.Bounce), {TextSize = 110}):Play()
+		
+		task.spawn(function()
+			local camera = workspace.CurrentCamera
+			local startTime = tick()
+			local connection
+			connection = RunService.RenderStepped:Connect(function()
+				if tick() - startTime > 0.5 then
+					connection:Disconnect()
+					return
+				end
+				local shake = CFrame.Angles(
+					math.rad(math.random(-15, 15) / 10),
+					math.rad(math.random(-15, 15) / 10),
+					math.rad(math.random(-15, 15) / 10)
+				)
+				camera.CFrame = camera.CFrame * shake
+			end)
+		end)
+		
+		task.wait(1.5)
+		TweenService:Create(lockIcon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {TextSize = 0, TextTransparency = 1}):Play()
+		
 		task.spawn(function()
 			local fade = TweenService:Create(bgMusic, TweenInfo.new(2, Enum.EasingStyle.Linear), {Volume = 0})
 			fade:Play()
 			fade.Completed:Wait()
 			soundFolder:Destroy()
+			lockGui:Destroy()
 		end)
 	else
 		errorSound:Play()
