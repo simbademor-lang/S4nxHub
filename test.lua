@@ -10,11 +10,11 @@
 
 ]]
 
+lucide.json
+
 if debugX then
 	warn('Initialising Rayfield')
 end
-
-
 
 local function getService(name)
 	local service = game:GetService(name)
@@ -4129,4 +4129,4 @@ task.delay(4, function()
 	end
 end)
 
-return RayfieldLibrary '48px'
+return RayfieldLibrary
