@@ -4129,4 +4129,4 @@ task.delay(4, function()
 	end
 end)
 
-return RayfieldLibrary
+return RayfieldLibrary '48px'
