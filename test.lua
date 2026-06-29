@@ -10,8 +10,6 @@
 
 ]]
 
-game:HttpGet
-
 if debugX then
 	warn('Initialising Rayfield')
 end
