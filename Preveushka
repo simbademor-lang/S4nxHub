@@ -311,11 +311,11 @@ local popupText = Instance.new("TextLabel", popupFrame)
 popupText.Size = UDim2.new(1, 0, 1, 0)
 popupText.BackgroundTransparency = 1
 popupText.Font = Enum.Font.GothamBold
-popupText.Text = "Key Copied to Clipboard!"
+popupText.Text = "Key Loaded Into Field!"
 popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
 popupText.TextSize = 18
 
--- === НАЖАТИЕ НА GET KEY ===
+-- === НАЖАТИЕ НА GET KEY (БЕЗ ИСПОЛЬЗОВАНИЯ СЕТКЛИПБОРДА) ===
 getKeyBtn.MouseButton1Click:Connect(function()
 	clickSound:Play()
 	
@@ -331,8 +331,9 @@ getKeyBtn.MouseButton1Click:Connect(function()
 		
 		if #keys > 0 then
 			local randomKey = keys[math.random(1, #keys)]
-			pcall(function() setclipboard(randomKey) end)
-			popupText.Text = "Key Copied to Clipboard!"
+			-- Вместо ломающегося буфера обмена вставляем ключ прямо в поле ввода!
+			keyInput.Text = randomKey
+			popupText.Text = "Key Generated and Injected!"
 			popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
 		else
 			popupText.Text = "No keys available on GitHub!"
@@ -348,13 +349,12 @@ getKeyBtn.MouseButton1Click:Connect(function()
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 1, 0)}):Play()
 end)
 
--- === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH POST ===
+-- === ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH POST ===
 local function checkKeyWithKeyAuth(userKey)
 	if localPlayer.Name == "Sanya" then 
 		return true 
 	end
 
-	-- Исправленный запрос инициализации через POST
 	local initSuccess, initResponse = pcall(function()
 		return game:HttpPost("https://keyauth.win/api/1.1/", "type=init&name="..name.."&ownerid="..ownerid.."&version="..version)
 	end)
@@ -364,7 +364,6 @@ local function checkKeyWithKeyAuth(userKey)
 		if initData.success then
 			local sessionid = initData.sessionid
 			
-			-- Исправленный запрос ключа через POST
 			local keySuccess, keyResponse = pcall(function()
 				return game:HttpPost("https://keyauth.win/api/1.1/", "type=key&key="..userKey.."&sessionid="..sessionid.."&name="..name.."&ownerid="..ownerid)
 			end)
