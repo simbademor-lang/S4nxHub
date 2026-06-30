@@ -315,9 +315,10 @@ popupText.Text = "Link Copied to Clipboard!"
 popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
 popupText.TextSize = 18
 
+-- ТУТ ССЫЛКА ДЛЯ ТВОИХ ИГРОКОВ (ЗАМЕНИ НА СВОЙ ДИСКОРД ИЛИ ДР.)
 getKeyBtn.MouseButton1Click:Connect(function()
 	clickSound:Play()
-	pcall(function() setclipboard("https://keyauth.cc/app/") end)
+	pcall(function() setclipboard("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y") end)
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
 	task.wait(2)
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 1, 0)}):Play()
@@ -325,6 +326,11 @@ end)
 
 -- === ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH API ===
 local function checkKeyWithKeyAuth(userKey)
+	-- Проверка ника (тебя пропускает без ключа)
+	if localPlayer.Name == "Sanya" then 
+		return true 
+	end
+
 	local initUrl = string.format("https://keyauth.win/api/1.1/?type=init&name=%s&ownerid=%s&version=%s", name, ownerid, version)
 	local success, response = pcall(function()
 		return game:HttpGet(initUrl)
