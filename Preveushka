@@ -311,39 +311,62 @@ local popupText = Instance.new("TextLabel", popupFrame)
 popupText.Size = UDim2.new(1, 0, 1, 0)
 popupText.BackgroundTransparency = 1
 popupText.Font = Enum.Font.GothamBold
-popupText.Text = "Link Copied to Clipboard!"
+popupText.Text = "Key Copied to Clipboard!"
 popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
 popupText.TextSize = 18
 
--- ТУТ ССЫЛКА ДЛЯ ТВОИХ ИГРОКОВ (ЗАМЕНИ НА СВОЙ ДИСКОРД ИЛИ ДР.)
+-- === НАЖАТИЕ НА GET KEY ===
 getKeyBtn.MouseButton1Click:Connect(function()
 	clickSound:Play()
-	pcall(function() setclipboard("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y") end)
+	
+	local success, response = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
+	end)
+	
+	if success and response then
+		local keys = {}
+		for line in string.gmatch(response, "[^\r\n]+") do
+			table.insert(keys, string.gsub(line, "%s+", ""))
+		end
+		
+		if #keys > 0 then
+			local randomKey = keys[math.random(1, #keys)]
+			pcall(function() setclipboard(randomKey) end)
+			popupText.Text = "Key Copied to Clipboard!"
+			popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
+		else
+			popupText.Text = "No keys available on GitHub!"
+			popupText.TextColor3 = Color3.fromRGB(255, 100, 100)
+		end
+	else
+		popupText.Text = "Failed to connect to GitHub!"
+		popupText.TextColor3 = Color3.fromRGB(255, 100, 100)
+	end
+	
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
 	task.wait(2)
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 1, 0)}):Play()
 end)
 
--- === ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH API ===
+-- === ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH POST ===
 local function checkKeyWithKeyAuth(userKey)
-	-- Проверка ника (тебя пропускает без ключа)
 	if localPlayer.Name == "Sanya" then 
 		return true 
 	end
 
-	local initUrl = string.format("https://keyauth.win/api/1.1/?type=init&name=%s&ownerid=%s&version=%s", name, ownerid, version)
-	local success, response = pcall(function()
-		return game:HttpGet(initUrl)
+	-- Исправленный запрос инициализации через POST
+	local initSuccess, initResponse = pcall(function()
+		return game:HttpPost("https://keyauth.win/api/1.1/", "type=init&name="..name.."&ownerid="..ownerid.."&version="..version)
 	end)
 	
-	if success and response then
-		local initData = HttpService:JSONDecode(response)
+	if initSuccess and initResponse then
+		local initData = HttpService:JSONDecode(initResponse)
 		if initData.success then
 			local sessionid = initData.sessionid
-			local checkUrl = string.format("https://keyauth.win/api/1.1/?type=key&key=%s&sessionid=%s&name=%s&ownerid=%s", userKey, sessionid, name, ownerid)
 			
+			-- Исправленный запрос ключа через POST
 			local keySuccess, keyResponse = pcall(function()
-				return game:HttpGet(checkUrl)
+				return game:HttpPost("https://keyauth.win/api/1.1/", "type=key&key="..userKey.."&sessionid="..sessionid.."&name="..name.."&ownerid="..ownerid)
 			end)
 			
 			if keySuccess and keyResponse then
