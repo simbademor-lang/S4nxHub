@@ -1,5 +1,10 @@
+local name = "S4nxHub Key";
+local ownerid = "JrtmgOZKQq";
+local version = "1.0";
+
 _G.KeyVerified = false
 
+local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -33,7 +38,7 @@ errorSound.SoundId = "rbxassetid://131661013076677"
 errorSound.Volume = 1
 
 local bgMusic = Instance.new("Sound", soundFolder)
-bgMusic.SoundId = "rbxassetid://140449815647953" -- ТУТ_АЙДИ_МУЗЫКИ
+bgMusic.SoundId = "rbxassetid://140449815647953"
 bgMusic.Volume = 0
 bgMusic.Looped = true
 bgMusic:Play()
@@ -66,7 +71,6 @@ lineRight.BorderSizePixel = 0
 lineRight.Position = UDim2.new(1, 0, 0.5, -1)
 lineRight.Size = UDim2.new(0.5, 0, 0, 2)
 
--- Рандомная загрузка линий (около 4-5 сек)
 local totalLoadTime = 0
 while totalLoadTime < 4 do
 	local stepWait = math.random(5, 12) / 10
@@ -75,14 +79,13 @@ while totalLoadTime < 4 do
 	
 	TweenService:Create(lineLeft, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(-0.5 + (0.5 * progress), 0, 0.5, -1)}):Play()
 	TweenService:Create(lineRight, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(1 - (0.5 * progress), 0, 0.5, -1)}):Play()
-	task.wait(stepWait + math.random(1, 4)/10) -- Рандомные паузы
+	task.wait(stepWait + math.random(1, 4)/10)
 end
 
 TweenService:Create(lineLeft, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0.5, -1)}):Play()
 TweenService:Create(lineRight, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 0.5, -1)}):Play()
 task.wait(0.5)
 
--- Спавн смайлов ПОСЛЕ загрузки линий
 local summerEmojis = {"☀️", "🌴", "🍉", "🌊", "🍹", "🍧"}
 for i = 1, 25 do
 	local emoji = Instance.new("TextLabel", introFrame)
@@ -101,7 +104,6 @@ end
 
 task.wait(1.5)
 
--- Линии уходят обратно откуда пришли
 TweenService:Create(lineLeft, infoSmooth, {Position = UDim2.new(-0.5, 0, 0.5, -1)}):Play()
 TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(1, 0, 0.5, -1)}):Play()
 task.wait(0.8)
@@ -315,11 +317,37 @@ popupText.TextSize = 18
 
 getKeyBtn.MouseButton1Click:Connect(function()
 	clickSound:Play()
-	pcall(function() setclipboard("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y") end)
+	pcall(function() setclipboard("https://keyauth.cc/app/") end)
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
 	task.wait(2)
 	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 1, 0)}):Play()
 end)
+
+-- === ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH API ===
+local function checkKeyWithKeyAuth(userKey)
+	local initUrl = string.format("https://keyauth.win/api/1.1/?type=init&name=%s&ownerid=%s&version=%s", name, ownerid, version)
+	local success, response = pcall(function()
+		return game:HttpGet(initUrl)
+	end)
+	
+	if success and response then
+		local initData = HttpService:JSONDecode(response)
+		if initData.success then
+			local sessionid = initData.sessionid
+			local checkUrl = string.format("https://keyauth.win/api/1.1/?type=key&key=%s&sessionid=%s&name=%s&ownerid=%s", userKey, sessionid, name, ownerid)
+			
+			local keySuccess, keyResponse = pcall(function()
+				return game:HttpGet(checkUrl)
+			end)
+			
+			if keySuccess and keyResponse then
+				local keyData = HttpService:JSONDecode(keyResponse)
+				return keyData.success
+			end
+		end
+	end
+	return false
+end
 
 local isVerifying = false
 
@@ -329,17 +357,8 @@ verifyBtn.MouseButton1Click:Connect(function()
 	clickSound:Play()
 	verifyBtn.Text = "..."
 
-	local inputKey = keyInput.Text
-	local success, targetKey = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
-	end)
-
-	local keyMatches = false
-	if success and targetKey then
-		targetKey = string.gsub(targetKey, "%s+", "")
-		inputKey = string.gsub(inputKey, "%s+", "")
-		if inputKey == targetKey then keyMatches = true end
-	end
+	local inputKey = string.gsub(keyInput.Text, "%s+", "")
+	local keyMatches = checkKeyWithKeyAuth(inputKey)
 
 	if keyMatches then
 		_G.KeyVerified = true
@@ -375,7 +394,6 @@ verifyBtn.MouseButton1Click:Connect(function()
 		task.wait(0.8)
 		screenGui:Destroy()
 		
-		-- === АНИМАЦИЯ ЗАМКА И ТРЯСКА КАМЕРЫ ===
 		local lockGui = Instance.new("ScreenGui", guiParent)
 		lockGui.IgnoreGuiInset = true
 		
