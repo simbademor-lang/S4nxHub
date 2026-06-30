@@ -1,7 +1,3 @@
-local name = "S4nxHub Key";
-local ownerid = "JrtmgOZKQq";
-local version = "1.0";
-
 _G.KeyVerified = false
 
 local HttpService = game:GetService("HttpService")
@@ -18,33 +14,6 @@ if guiParent:FindFirstChild("S4nxHub_Ultra") then
 	guiParent.S4nxHub_Ultra:Destroy()
 end
 
-for _, v in pairs(guiParent:GetChildren()) do
-	if v.Name == "S4nxSounds" then v:Destroy() end
-end
-
-local soundFolder = Instance.new("Folder", guiParent)
-soundFolder.Name = "S4nxSounds"
-
-local clickSound = Instance.new("Sound", soundFolder)
-clickSound.SoundId = "rbxassetid://139719503904449"
-clickSound.Volume = 1
-
-local successSound = Instance.new("Sound", soundFolder)
-successSound.SoundId = "rbxassetid://136993031050456"
-successSound.Volume = 1
-
-local errorSound = Instance.new("Sound", soundFolder)
-errorSound.SoundId = "rbxassetid://131661013076677"
-errorSound.Volume = 1
-
-local bgMusic = Instance.new("Sound", soundFolder)
-bgMusic.SoundId = "rbxassetid://140449815647953"
-bgMusic.Volume = 0
-bgMusic.Looped = true
-bgMusic:Play()
-
-TweenService:Create(bgMusic, TweenInfo.new(3, Enum.EasingStyle.Linear), {Volume = 1}):Play()
-
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "S4nxHub_Ultra"
 screenGui.IgnoreGuiInset = true
@@ -54,7 +23,6 @@ screenGui.Parent = guiParent
 local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 local infoSmooth = TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
--- === ФАЗА 1: ЛИНИИ (Загрузка) И ЛЕТНИЕ СМАЙЛЫ ===
 local introFrame = Instance.new("Frame", screenGui)
 introFrame.Size = UDim2.new(1, 0, 1, 0)
 introFrame.BackgroundTransparency = 1
@@ -109,7 +77,6 @@ TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(1, 0, 0.5, -1)}
 task.wait(0.8)
 introFrame:Destroy()
 
--- === ФАЗА 2: ГЛАВНЫЙ ИНТЕРФЕЙС И ДНК ФОН ===
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -301,96 +268,33 @@ TweenService:Create(inputStroke, infoSmooth, {Transparency = 0}):Play()
 TweenService:Create(verifyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
 TweenService:Create(getKeyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
 
-local popupFrame = Instance.new("Frame", mainFrame)
-popupFrame.Size = UDim2.new(1, 0, 1, 0)
-popupFrame.Position = UDim2.new(0, 0, 1, 0)
-popupFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
-popupFrame.BorderSizePixel = 0
-
-local popupText = Instance.new("TextLabel", popupFrame)
-popupText.Size = UDim2.new(1, 0, 1, 0)
-popupText.BackgroundTransparency = 1
-popupText.Font = Enum.Font.GothamBold
-popupText.Text = "Key Loaded Into Field!"
-popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
-popupText.TextSize = 18
-
--- === НАЖАТИЕ НА GET KEY (БЕЗ ИСПОЛЬЗОВАНИЯ СЕТКЛИПБОРДА) ===
 getKeyBtn.MouseButton1Click:Connect(function()
-	clickSound:Play()
-	
-	local success, response = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
-	end)
-	
-	if success and response then
-		local keys = {}
-		for line in string.gmatch(response, "[^\r\n]+") do
-			table.insert(keys, string.gsub(line, "%s+", ""))
-		end
-		
-		if #keys > 0 then
-			local randomKey = keys[math.random(1, #keys)]
-			-- Вместо ломающегося буфера обмена вставляем ключ прямо в поле ввода!
-			keyInput.Text = randomKey
-			popupText.Text = "Key Generated and Injected!"
-			popupText.TextColor3 = Color3.fromRGB(100, 255, 100)
-		else
-			popupText.Text = "No keys available on GitHub!"
-			popupText.TextColor3 = Color3.fromRGB(255, 100, 100)
-		end
-	else
-		popupText.Text = "Failed to connect to GitHub!"
-		popupText.TextColor3 = Color3.fromRGB(255, 100, 100)
-	end
-	
-	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, 0)}):Play()
-	task.wait(2)
-	TweenService:Create(popupFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0, 0, 1, 0)}):Play()
+	local response = game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
+	local keys = string.split(response, "\n")
+	local randomKey = keys[math.random(1, #keys)]
+	keyInput.Text = randomKey
 end)
 
--- === ФУНКЦИЯ ПРОВЕРКИ ЧЕРЕЗ KEYAUTH POST ===
-local function checkKeyWithKeyAuth(userKey)
-	if localPlayer.Name == "Sanya" then 
-		return true 
-	end
-
-	local initSuccess, initResponse = pcall(function()
-		return game:HttpPost("https://keyauth.win/api/1.1/", "type=init&name="..name.."&ownerid="..ownerid.."&version="..version)
-	end)
+verifyBtn.MouseButton1Click:Connect(function()
+	verifyBtn.Text = "..."
+	local response = game:HttpGet("https://raw.githubusercontent.com/simbademor-lang/S4nxHub/main/k3y")
+	local keys = string.split(response, "\n")
+	local cleanInput = string.gsub(keyInput.Text, "%s+", "")
 	
-	if initSuccess and initResponse then
-		local initData = HttpService:JSONDecode(initResponse)
-		if initData.success then
-			local sessionid = initData.sessionid
-			
-			local keySuccess, keyResponse = pcall(function()
-				return game:HttpPost("https://keyauth.win/api/1.1/", "type=key&key="..userKey.."&sessionid="..sessionid.."&name="..name.."&ownerid="..ownerid)
-			end)
-			
-			if keySuccess and keyResponse then
-				local keyData = HttpService:JSONDecode(keyResponse)
-				return keyData.success
-			end
+	local match = false
+	for _, k in pairs(keys) do
+		if string.gsub(k, "%s+", "") == cleanInput then
+			match = true
+			break
 		end
 	end
-	return false
-end
 
-local isVerifying = false
+	if localPlayer.Name == "Scorebet77" then
+		match = true
+	end
 
-verifyBtn.MouseButton1Click:Connect(function()
-	if isVerifying then return end
-	isVerifying = true
-	clickSound:Play()
-	verifyBtn.Text = "..."
-
-	local inputKey = string.gsub(keyInput.Text, "%s+", "")
-	local keyMatches = checkKeyWithKeyAuth(inputKey)
-
-	if keyMatches then
+	if match then
 		_G.KeyVerified = true
-		successSound:Play()
 		verifyBtn.Text = "SUCCESS"
 		verifyBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
 		
@@ -460,16 +364,9 @@ verifyBtn.MouseButton1Click:Connect(function()
 		
 		task.wait(1.5)
 		TweenService:Create(lockIcon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {TextSize = 0, TextTransparency = 1}):Play()
-		
-		task.spawn(function()
-			local fade = TweenService:Create(bgMusic, TweenInfo.new(2, Enum.EasingStyle.Linear), {Volume = 0})
-			fade:Play()
-			fade.Completed:Wait()
-			soundFolder:Destroy()
-			lockGui:Destroy()
-		end)
+		task.wait(0.5)
+		lockGui:Destroy()
 	else
-		errorSound:Play()
 		verifyBtn.Text = "WRONG KEY"
 		verifyBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
 		
@@ -492,7 +389,6 @@ verifyBtn.MouseButton1Click:Connect(function()
 		verifyBtn.Text = "Verify"
 		verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 		strokeGradient.Color = origColor
-		isVerifying = false
 	end
 end)
 
