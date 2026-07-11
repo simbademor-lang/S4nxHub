@@ -9,10 +9,13 @@ local CoreGui = game:GetService("CoreGui")
 local localPlayer = Players.LocalPlayer
 
 -- КОНФИГ PANDA KEY
-local ServiceID = "s4nxhub" 
+local ServiceID = "s4nxhub"
 
 local guiParent = pcall(function() return CoreGui.Name end) and CoreGui or localPlayer:WaitForChild("PlayerGui")
-if guiParent:FindFirstChild("S4nxHub_Ultra") then guiParent.S4nxHub_Ultra:Destroy() end
+
+if guiParent:FindFirstChild("S4nxHub_Ultra") then
+	guiParent.S4nxHub_Ultra:Destroy()
+end
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "S4nxHub_Ultra"
@@ -20,79 +23,129 @@ screenGui.IgnoreGuiInset = true
 screenGui.ResetOnSpawn = false
 screenGui.Parent = guiParent
 
--- [ТУТ ОСТАВЛЯЕМ ТВОИ АНИМАЦИИ ВХОДА (INTRO)]
+local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+local infoSmooth = TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+
+-- [ТВОЯ АНИМАЦИЯ ВХОДА]
 local introFrame = Instance.new("Frame", screenGui)
 introFrame.Size = UDim2.new(1, 0, 1, 0)
 introFrame.BackgroundTransparency = 1
+
 local lineLeft = Instance.new("Frame", introFrame)
 lineLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 lineLeft.BorderSizePixel = 0
 lineLeft.Position = UDim2.new(-0.5, 0, 0.5, -1)
 lineLeft.Size = UDim2.new(0.5, 0, 0, 2)
+
 local lineRight = Instance.new("Frame", introFrame)
 lineRight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 lineRight.BorderSizePixel = 0
 lineRight.Position = UDim2.new(1, 0, 0.5, -1)
 lineRight.Size = UDim2.new(0.5, 0, 0, 2)
 
--- ... (тут твой код анимации загрузки) ...
-task.wait(2) 
+local totalLoadTime = 0
+while totalLoadTime < 4 do
+	local stepWait = math.random(5, 12) / 10
+	totalLoadTime = totalLoadTime + stepWait
+	local progress = math.min(1, totalLoadTime / 4.5)
+	
+	TweenService:Create(lineLeft, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(-0.5 + (0.5 * progress), 0, 0.5, -1)}):Play()
+	TweenService:Create(lineRight, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(1 - (0.5 * progress), 0, 0.5, -1)}):Play()
+	task.wait(stepWait + math.random(1, 4)/10)
+end
+
+TweenService:Create(lineLeft, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0.5, -1)}):Play()
+TweenService:Create(lineRight, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 0.5, -1)}):Play()
+task.wait(0.5)
+
+local summerEmojis = {"☀️", "🌴", "🍉", "🌊", "🍹", "🍧"}
+for i = 1, 25 do
+	local emoji = Instance.new("TextLabel", introFrame)
+	emoji.BackgroundTransparency = 1
+	emoji.Text = summerEmojis[math.random(1, #summerEmojis)]
+	emoji.TextSize = math.random(25, 45)
+	emoji.Position = UDim2.new(math.random(10, 90)/100, 0, -0.2, 0)
+	emoji.Rotation = math.random(-180, 180)
+	
+	TweenService:Create(emoji, TweenInfo.new(math.random(15, 30)/10, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {
+		Position = UDim2.new(emoji.Position.X.Scale, 0, 1.2, 0),
+		Rotation = emoji.Rotation + 360
+	}):Play()
+	task.wait(0.02)
+end
+task.wait(1.5)
 introFrame:Destroy()
 
--- ОСНОВНОЕ ОКНО
+-- [ОСНОВНОЕ ОКНО]
 local mainFrame = Instance.new("Frame", screenGui)
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 mainFrame.Size = UDim2.new(0, 400, 0, 220)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
 mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
+local mainStroke = Instance.new("UIStroke", mainFrame)
+mainStroke.Thickness = 2
+local strokeGradient = Instance.new("UIGradient", mainStroke)
+strokeGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 150, 100)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 255))
+})
+
+-- [ИНТЕРФЕЙС И КНОПКИ]
 local keyInput = Instance.new("TextBox", mainFrame)
 keyInput.Size = UDim2.new(0.7, 0, 0, 35)
 keyInput.Position = UDim2.new(0.5, 0, 0.6, 0)
 keyInput.AnchorPoint = Vector2.new(0.5, 0.5)
-keyInput.PlaceholderText = "Enter Key Here..."
-keyInput.TextColor3 = Color3.new(1,1,1)
 keyInput.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-Instance.new("UICorner", keyInput)
+keyInput.PlaceholderText = "Enter Key Here..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 
-local verifyBtn = Instance.new("TextButton", mainFrame)
-verifyBtn.Size = UDim2.new(0.3, 0, 0, 35)
-verifyBtn.Position = UDim2.new(0.35, 0, 0.8, 0)
+local btnContainer = Instance.new("Frame", mainFrame)
+btnContainer.Size = UDim2.new(0.7, 0, 0, 35)
+btnContainer.Position = UDim2.new(0.5, 0, 0.8, 0)
+btnContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+btnContainer.BackgroundTransparency = 1
+
+local verifyBtn = Instance.new("TextButton", btnContainer)
+verifyBtn.Size = UDim2.new(0.48, 0, 1, 0)
 verifyBtn.Text = "Verify"
 verifyBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 
-local getKeyBtn = Instance.new("TextButton", mainFrame)
-getKeyBtn.Size = UDim2.new(0.3, 0, 0, 35)
-getKeyBtn.Position = UDim2.new(0.65, 0, 0.8, 0)
+local getKeyBtn = Instance.new("TextButton", btnContainer)
+getKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+getKeyBtn.Position = UDim2.new(0.52, 0, 0, 0)
 getKeyBtn.Text = "Get Key"
 getKeyBtn.BackgroundColor3 = Color3.fromRGB(45, 35, 35)
 
--- ИНТЕГРАЦИЯ PANDA
+-- [ЛОГИКА PANDA KEY]
 getKeyBtn.MouseButton1Click:Connect(function()
-    setclipboard("https://pandadevelopment.net/key/v3/" .. ServiceID)
-    keyInput.Text = "Link copied!"
+	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+	setclipboard("https://adsense.pandadevelopment.net/getkey?service=" .. ServiceID .. "&hwid=" .. hwid)
+	keyInput.Text = "Link copied!"
 end)
 
 verifyBtn.MouseButton1Click:Connect(function()
-    local inputKey = string.gsub(keyInput.Text, "%s+", "")
-    if inputKey == "" then return end
-    
-    verifyBtn.Text = "..."
-    local success, response = pcall(function()
-        return game:HttpGet("https://api.pandadevelopment.net/key/v3/" .. ServiceID .. "/validate?key=" .. inputKey)
-    end)
-    
-    if success and response == "true" then
-        _G.KeyVerified = true
-        verifyBtn.Text = "SUCCESS"
-        -- [ТУТ ТВОЯ АНИМАЦИЯ ЗАКРЫТИЯ И ВХОДА]
-    else
-        verifyBtn.Text = "INVALID"
-        task.wait(1)
-        verifyBtn.Text = "Verify"
-    end
+	verifyBtn.Text = "..."
+	local inputKey = string.gsub(keyInput.Text, "%s+", "")
+	
+	local success, response = pcall(function()
+		return game:HttpGet("https://api.pandadevelopment.net/key/v3/" .. ServiceID .. "/validate?key=" .. inputKey)
+	end)
+	
+	if success and response == "true" then
+		_G.KeyVerified = true
+		verifyBtn.Text = "SUCCESS"
+		-- [ТВОЯ ОРИГИНАЛЬНАЯ АНИМАЦИЯ УСПЕХА]
+		screenGui:Destroy()
+	else
+		verifyBtn.Text = "WRONG KEY"
+		task.wait(1)
+		verifyBtn.Text = "Verify"
+	end
 end)
 
 repeat task.wait(0.5) until _G.KeyVerified
