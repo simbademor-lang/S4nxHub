@@ -11,20 +11,13 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 
 local localPlayer = Players.LocalPlayer
-
-
+local ServiceID = "S4NX HUB-8DBY-GEMD-3W3G-IK1O"
 
 local guiParent = pcall(function() return CoreGui.Name end) and CoreGui or localPlayer:WaitForChild("PlayerGui")
 
-
-
 if guiParent:FindFirstChild("S4nxHub_Ultra") then
-
 guiParent.S4nxHub_Ultra:Destroy()
-
 end
-
-
 
 local screenGui = Instance.new("ScreenGui")
 
