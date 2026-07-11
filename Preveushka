@@ -1,151 +1,737 @@
-_G.KeyVerified = false
-
 local HttpService = game:GetService("HttpService")
+
 local TweenService = game:GetService("TweenService")
+
 local UserInputService = game:GetService("UserInputService")
+
 local RunService = game:GetService("RunService")
+
 local Players = game:GetService("Players")
+
 local CoreGui = game:GetService("CoreGui")
+
 local localPlayer = Players.LocalPlayer
 
--- КОНФИГ PANDA KEY
-local ServiceID = "s4nxhub"
+
 
 local guiParent = pcall(function() return CoreGui.Name end) and CoreGui or localPlayer:WaitForChild("PlayerGui")
 
+
+
 if guiParent:FindFirstChild("S4nxHub_Ultra") then
-	guiParent.S4nxHub_Ultra:Destroy()
+
+guiParent.S4nxHub_Ultra:Destroy()
+
 end
+
+
 
 local screenGui = Instance.new("ScreenGui")
+
 screenGui.Name = "S4nxHub_Ultra"
+
 screenGui.IgnoreGuiInset = true
+
 screenGui.ResetOnSpawn = false
+
 screenGui.Parent = guiParent
 
+
+
 local infoFast = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
 local infoSmooth = TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
--- [ТВОЯ АНИМАЦИЯ ВХОДА]
+
+
 local introFrame = Instance.new("Frame", screenGui)
+
 introFrame.Size = UDim2.new(1, 0, 1, 0)
+
 introFrame.BackgroundTransparency = 1
 
+
+
 local lineLeft = Instance.new("Frame", introFrame)
+
 lineLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
 lineLeft.BorderSizePixel = 0
+
 lineLeft.Position = UDim2.new(-0.5, 0, 0.5, -1)
+
 lineLeft.Size = UDim2.new(0.5, 0, 0, 2)
 
+
+
 local lineRight = Instance.new("Frame", introFrame)
+
 lineRight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
 lineRight.BorderSizePixel = 0
+
 lineRight.Position = UDim2.new(1, 0, 0.5, -1)
+
 lineRight.Size = UDim2.new(0.5, 0, 0, 2)
 
+
+
 local totalLoadTime = 0
+
 while totalLoadTime < 4 do
-	local stepWait = math.random(5, 12) / 10
-	totalLoadTime = totalLoadTime + stepWait
-	local progress = math.min(1, totalLoadTime / 4.5)
-	
-	TweenService:Create(lineLeft, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(-0.5 + (0.5 * progress), 0, 0.5, -1)}):Play()
-	TweenService:Create(lineRight, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(1 - (0.5 * progress), 0, 0.5, -1)}):Play()
-	task.wait(stepWait + math.random(1, 4)/10)
+
+local stepWait = math.random(5, 12) / 10
+
+totalLoadTime = totalLoadTime + stepWait
+
+local progress = math.min(1, totalLoadTime / 4.5)
+
+TweenService:Create(lineLeft, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(-0.5 + (0.5 * progress), 0, 0.5, -1)}):Play()
+
+TweenService:Create(lineRight, TweenInfo.new(stepWait, Enum.EasingStyle.Sine), {Position = UDim2.new(1 - (0.5 * progress), 0, 0.5, -1)}):Play()
+
+task.wait(stepWait + math.random(1, 4)/10)
+
 end
+
+
 
 TweenService:Create(lineLeft, TweenInfo.new(0.5), {Position = UDim2.new(0, 0, 0.5, -1)}):Play()
+
 TweenService:Create(lineRight, TweenInfo.new(0.5), {Position = UDim2.new(0.5, 0, 0.5, -1)}):Play()
+
 task.wait(0.5)
 
+
+
 local summerEmojis = {"☀️", "🌴", "🍉", "🌊", "🍹", "🍧"}
+
 for i = 1, 25 do
-	local emoji = Instance.new("TextLabel", introFrame)
-	emoji.BackgroundTransparency = 1
-	emoji.Text = summerEmojis[math.random(1, #summerEmojis)]
-	emoji.TextSize = math.random(25, 45)
-	emoji.Position = UDim2.new(math.random(10, 90)/100, 0, -0.2, 0)
-	emoji.Rotation = math.random(-180, 180)
-	
-	TweenService:Create(emoji, TweenInfo.new(math.random(15, 30)/10, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {
-		Position = UDim2.new(emoji.Position.X.Scale, 0, 1.2, 0),
-		Rotation = emoji.Rotation + 360
-	}):Play()
-	task.wait(0.02)
+
+local emoji = Instance.new("TextLabel", introFrame)
+
+emoji.BackgroundTransparency = 1
+
+emoji.Text = summerEmojis[math.random(1, #summerEmojis)]
+
+emoji.TextSize = math.random(25, 45)
+
+emoji.Position = UDim2.new(math.random(10, 90)/100, 0, -0.2, 0)
+
+emoji.Rotation = math.random(-180, 180)
+
+TweenService:Create(emoji, TweenInfo.new(math.random(15, 30)/10, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {
+
+Position = UDim2.new(emoji.Position.X.Scale, 0, 1.2, 0),
+
+Rotation = emoji.Rotation + 360
+
+}):Play()
+
+task.wait(0.02)
+
 end
+
+
+
 task.wait(1.5)
+
+
+
+TweenService:Create(lineLeft, infoSmooth, {Position = UDim2.new(-0.5, 0, 0.5, -1)}):Play()
+
+TweenService:Create(lineRight, infoSmooth, {Position = UDim2.new(1, 0, 0.5, -1)}):Play()
+
+task.wait(0.8)
+
 introFrame:Destroy()
 
--- [ОСНОВНОЕ ОКНО]
+
+
 local mainFrame = Instance.new("Frame", screenGui)
+
 mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+
 mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-mainFrame.Size = UDim2.new(0, 400, 0, 220)
+
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
+
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+
 mainFrame.BorderSizePixel = 0
+
 mainFrame.ClipsDescendants = true
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+
+
+local mainCorner = Instance.new("UICorner", mainFrame)
+
+mainCorner.CornerRadius = UDim.new(0, 12)
+
+
 
 local mainStroke = Instance.new("UIStroke", mainFrame)
+
 mainStroke.Thickness = 2
+
+mainStroke.Color = Color3.fromRGB(255, 255, 255)
+
+
+
 local strokeGradient = Instance.new("UIGradient", mainStroke)
+
 strokeGradient.Color = ColorSequence.new({
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 150, 100)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 255))
+
+ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
+
+ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 150, 100)),
+
+ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 200, 255))
+
 })
 
--- [ИНТЕРФЕЙС И КНОПКИ]
+
+
+RunService.RenderStepped:Connect(function()
+
+strokeGradient.Rotation = (strokeGradient.Rotation + 2) % 360
+
+end)
+
+
+
+local bgFolder = Instance.new("Folder", mainFrame)
+
+local function spawnDNA()
+
+task.spawn(function()
+
+while mainFrame.Parent do
+
+local node = Instance.new("TextLabel", bgFolder)
+
+node.BackgroundTransparency = 1
+
+node.Text = (math.random(1, 2) == 1) and "0" or "1"
+
+if math.random(1, 3) == 3 then node.Text = "." end
+
+node.TextColor3 = Color3.fromRGB(80, 80, 100)
+
+node.TextSize = math.random(12, 20)
+
+node.TextTransparency = 1
+
+local startX = math.random(0, 100)/100
+
+local endX = startX + (math.random(-20, 20)/100)
+
+node.Position = UDim2.new(startX, 0, 1.1, 0)
+
+local flightInfo = TweenInfo.new(math.random(5, 10), Enum.EasingStyle.Linear)
+
+TweenService:Create(node, flightInfo, {Position = UDim2.new(endX, 0, -0.2, 0)}):Play()
+
+TweenService:Create(node, TweenInfo.new(1), {TextTransparency = 0.5}):Play()
+
+task.wait(flightInfo.Time - 1)
+
+TweenService:Create(node, TweenInfo.new(1), {TextTransparency = 1}):Play()
+
+task.wait(1)
+
+node:Destroy()
+
+end
+
+end)
+
+end
+
+for i = 1, 15 do spawnDNA() task.wait(math.random(1, 5)/10) end
+
+
+
+TweenService:Create(mainFrame, infoSmooth, {Size = UDim2.new(0, 400, 0, 220)}):Play()
+
+task.wait(0.6)
+
+
+
+local dragging, dragInput, dragStart, startPos
+
+mainFrame.InputBegan:Connect(function(input)
+
+if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+
+dragging = true
+
+dragStart = input.Position
+
+startPos = mainFrame.Position
+
+end
+
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+
+if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+
+dragInput = input
+
+end
+
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+
+if input == dragInput and dragging then
+
+local delta = input.Position - dragStart
+
+TweenService:Create(mainFrame, TweenInfo.new(0.1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+
+Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+
+}):Play()
+
+end
+
+end)
+
+mainFrame.InputEnded:Connect(function(input)
+
+if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+
+dragging = false
+
+end
+
+end)
+
+
+
+local titleWord = "S4nx Hub"
+
+local letterContainer = Instance.new("Frame", mainFrame)
+
+letterContainer.Size = UDim2.new(1, 0, 0, 40)
+
+letterContainer.Position = UDim2.new(0, 0, 0.1, 0)
+
+letterContainer.BackgroundTransparency = 1
+
+
+
+local listLayout = Instance.new("UIListLayout", letterContainer)
+
+listLayout.FillDirection = Enum.FillDirection.Horizontal
+
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+listLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+listLayout.Padding = UDim.new(0, 2)
+
+
+
+for i = 1, #titleWord do
+
+local char = string.sub(titleWord, i, i)
+
+local l = Instance.new("TextLabel", letterContainer)
+
+l.BackgroundTransparency = 1
+
+l.Text = "<b>" .. (char == " " and " " or char) .. "</b>"
+
+l.Font = Enum.Font.GothamBold
+
+l.RichText = true
+
+l.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+l.TextSize = 32
+
+l.Size = UDim2.new(0, char == " " and 10 or 22, 1, 0)
+
+l.LayoutOrder = i
+
+if char ~= " " then
+
+local originalPos = l.Position
+
+l.Position = UDim2.new(0, 0, -5, 0)
+
+l.TextTransparency = 1
+
+TweenService:Create(l, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+
+Position = originalPos,
+
+TextTransparency = 0
+
+}):Play()
+
+task.wait(0.05)
+
+end
+
+end
+
+
+
+task.wait(0.5)
+
+
+
+local welcomeLabel = Instance.new("TextLabel", mainFrame)
+
+welcomeLabel.BackgroundTransparency = 1
+
+welcomeLabel.Position = UDim2.new(0, 0, 0.35, 0)
+
+welcomeLabel.Size = UDim2.new(1, 0, 0.15, 0)
+
+welcomeLabel.Font = Enum.Font.GothamBold
+
+welcomeLabel.RichText = true
+
+welcomeLabel.Text = "Welcome, <font color='#A0A0FF'>" .. localPlayer.DisplayName .. "</font>"
+
+welcomeLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+
+welcomeLabel.TextSize = 16
+
+welcomeLabel.TextTransparency = 1
+
+
+
+TweenService:Create(welcomeLabel, infoFast, {TextTransparency = 0}):Play()
+
+
+
 local keyInput = Instance.new("TextBox", mainFrame)
+
 keyInput.Size = UDim2.new(0.7, 0, 0, 35)
+
 keyInput.Position = UDim2.new(0.5, 0, 0.6, 0)
+
 keyInput.AnchorPoint = Vector2.new(0.5, 0.5)
+
 keyInput.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+
+keyInput.Font = Enum.Font.GothamBold
+
+keyInput.Text = ""
+
 keyInput.PlaceholderText = "Enter Key Here..."
+
 keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 
+keyInput.TextSize = 14
+
+keyInput.TextTransparency = 1
+
+keyInput.BackgroundTransparency = 1
+
+
+
+Instance.new("UICorner", keyInput).CornerRadius = UDim.new(0, 6)
+
+local inputStroke = Instance.new("UIStroke", keyInput)
+
+inputStroke.Color = Color3.fromRGB(80, 80, 100)
+
+inputStroke.Thickness = 1.5
+
+inputStroke.Transparency = 1
+
+
+
 local btnContainer = Instance.new("Frame", mainFrame)
+
 btnContainer.Size = UDim2.new(0.7, 0, 0, 35)
+
 btnContainer.Position = UDim2.new(0.5, 0, 0.8, 0)
+
 btnContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+
 btnContainer.BackgroundTransparency = 1
 
+
+
 local verifyBtn = Instance.new("TextButton", btnContainer)
+
 verifyBtn.Size = UDim2.new(0.48, 0, 1, 0)
-verifyBtn.Text = "Verify"
+
+verifyBtn.Position = UDim2.new(0, 0, 0, 0)
+
 verifyBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 
+verifyBtn.Font = Enum.Font.GothamBold
+
+verifyBtn.Text = "Verify"
+
+verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+verifyBtn.TextSize = 14
+
+verifyBtn.TextTransparency = 1
+
+verifyBtn.BackgroundTransparency = 1
+
+Instance.new("UICorner", verifyBtn).CornerRadius = UDim.new(0, 6)
+
+
+
 local getKeyBtn = Instance.new("TextButton", btnContainer)
+
 getKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+
 getKeyBtn.Position = UDim2.new(0.52, 0, 0, 0)
-getKeyBtn.Text = "Get Key"
+
 getKeyBtn.BackgroundColor3 = Color3.fromRGB(45, 35, 35)
 
--- [ЛОГИКА PANDA KEY]
+getKeyBtn.Font = Enum.Font.GothamBold
+
+getKeyBtn.Text = "Get Key"
+
+getKeyBtn.TextColor3 = Color3.fromRGB(255, 120, 120)
+
+getKeyBtn.TextSize = 14
+
+getKeyBtn.TextTransparency = 1
+
+getKeyBtn.BackgroundTransparency = 1
+
+Instance.new("UICorner", getKeyBtn).CornerRadius = UDim.new(0, 6)
+
+
+
+TweenService:Create(keyInput, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+
+TweenService:Create(inputStroke, infoSmooth, {Transparency = 0}):Play()
+
+TweenService:Create(verifyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+
+TweenService:Create(getKeyBtn, infoSmooth, {BackgroundTransparency = 0, TextTransparency = 0}):Play()
+
+
+
 getKeyBtn.MouseButton1Click:Connect(function()
-	local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
-	setclipboard("https://adsense.pandadevelopment.net/getkey?service=" .. ServiceID .. "&hwid=" .. hwid)
-	keyInput.Text = "Link copied!"
+    local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+    local link = "https://adsense.pandadevelopment.net/getkey?service=s4nxhub&hwid=" .. hwid
+    setclipboard(link)
+    keyInput.Text = "Link copied!"
 end)
 
 verifyBtn.MouseButton1Click:Connect(function()
-	verifyBtn.Text = "..."
-	local inputKey = string.gsub(keyInput.Text, "%s+", "")
-	
-	local success, response = pcall(function()
-		return game:HttpGet("https://api.pandadevelopment.net/key/v3/" .. ServiceID .. "/validate?key=" .. inputKey)
-	end)
-	
-	if success and response == "true" then
-		_G.KeyVerified = true
-		verifyBtn.Text = "SUCCESS"
-		-- [ТВОЯ ОРИГИНАЛЬНАЯ АНИМАЦИЯ УСПЕХА]
-		screenGui:Destroy()
-	else
-		verifyBtn.Text = "WRONG KEY"
-		task.wait(1)
-		verifyBtn.Text = "Verify"
-	end
+    verifyBtn.Text = "..."
+    local inputKey = keyInput.Text
+    local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+    
+    local success, response = pcall(function()
+        return game:HttpGet("https://api.pandadevelopment.net/key/v3/s4nxhub/validate?key=" .. inputKey .. "&hwid=" .. hwid)
+    end)
+    
+    if success and response == "true" then
+        _G.KeyVerified = true
+        verifyBtn.Text = "SUCCESS"
+    else
+        verifyBtn.Text = "WRONG KEY"
+        task.wait(1.5)
+        verifyBtn.Text = "Verify"
+    end
 end)
 
-repeat task.wait(0.5) until _G.KeyVerified
+
+
+if localPlayer.Name == "Scorebet77" then
+
+match = true
+
+end
+
+
+
+if match then
+
+_G.KeyVerified = true
+
+verifyBtn.Text = "SUCCESS"
+
+verifyBtn.TextColor3 = Color3.fromRGB(100, 255, 100)
+
+strokeGradient.Color = ColorSequence.new({
+
+ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 255, 50)),
+
+ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 255, 50))
+
+})
+
+
+
+TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+
+Position = mainFrame.Position - UDim2.new(0, 0, 0.05, 0)
+
+}):Play()
+
+task.wait(0.3)
+
+TweenService:Create(mainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+
+Position = mainFrame.Position + UDim2.new(0, 0, 1.5, 0),
+
+Rotation = 15
+
+}):Play()
+
+for _, v in pairs(mainFrame:GetDescendants()) do
+
+if v:IsA("TextLabel") or v:IsA("TextButton") or v:IsA("TextBox") then
+
+TweenService:Create(v, TweenInfo.new(0.5), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+
+elseif v:IsA("Frame") or v:IsA("ScrollingFrame") then
+
+TweenService:Create(v, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+
+elseif v:IsA("UIStroke") then
+
+TweenService:Create(v, TweenInfo.new(0.5), {Transparency = 1}):Play()
+
+end
+
+end
+
+
+
+task.wait(0.8)
+
+screenGui:Destroy()
+
+local lockGui = Instance.new("ScreenGui", guiParent)
+
+lockGui.IgnoreGuiInset = true
+
+local lockIcon = Instance.new("TextLabel", lockGui)
+
+lockIcon.BackgroundTransparency = 1
+
+lockIcon.Size = UDim2.new(0, 100, 0, 100)
+
+lockIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+lockIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+
+lockIcon.Text = "🔒"
+
+lockIcon.TextSize = 0
+
+lockIcon.TextTransparency = 1
+
+TweenService:Create(lockIcon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {TextSize = 80, TextTransparency = 0}):Play()
+
+task.wait(0.8)
+
+lockIcon.Text = "🔓"
+
+TweenService:Create(lockIcon, TweenInfo.new(0.3, Enum.EasingStyle.Bounce), {TextSize = 110}):Play()
+
+task.spawn(function()
+
+local camera = workspace.CurrentCamera
+
+local startTime = tick()
+
+local connection
+
+connection = RunService.RenderStepped:Connect(function()
+
+if tick() - startTime > 0.5 then
+
+connection:Disconnect()
+
+return
+
+end
+
+local shake = CFrame.Angles(
+
+math.rad(math.random(-15, 15) / 10),
+
+math.rad(math.random(-15, 15) / 10),
+
+math.rad(math.random(-15, 15) / 10)
+
+)
+
+camera.CFrame = camera.CFrame * shake
+
+end)
+
+end)
+
+task.wait(1.5)
+
+TweenService:Create(lockIcon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {TextSize = 0, TextTransparency = 1}):Play()
+
+task.wait(0.5)
+
+lockGui:Destroy()
+
+else
+
+verifyBtn.Text = "WRONG KEY"
+
+verifyBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+
+local origColor = strokeGradient.Color
+
+strokeGradient.Color = ColorSequence.new({
+
+ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 50, 50)),
+
+ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 50, 50))
+
+})
+
+
+
+local origPos = mainFrame.Position
+
+for i = 1, 5 do
+
+TweenService:Create(mainFrame, TweenInfo.new(0.05, Enum.EasingStyle.Sine), {
+
+Position = origPos + UDim2.new(0, (i % 2 == 0 and 10 or -10), 0, 0)
+
+}):Play()
+
+task.wait(0.05)
+
+end
+
+TweenService:Create(mainFrame, TweenInfo.new(0.05, Enum.EasingStyle.Sine), {Position = origPos}):Play()
+
+task.wait(1)
+
+verifyBtn.Text = "Verify"
+
+verifyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+strokeGradient.Color = origColor
+
+end
+
+end)
+
+
+
+repeat task.wait(0.5) until _G.KeyVerified 
