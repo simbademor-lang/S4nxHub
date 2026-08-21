@@ -1,11 +1,8 @@
 return function(Window)
     local LatestChangelog = {
-        "11/7/2026",
-        "<font color='rgb(0, 255, 0)'>+ Added Entity ESP Selection</font>",
-		"<font color='rgb(0, 255, 0)'>+ Added Item Notifier</font>",
-		"<font color='rgb(0, 255, 0)'>+ Added Remove Surge</font>",
-		"<font color='rgb(0, 255, 0)'>+ Added Death Farm</font>",
-		"<font color='rgb(0, 255, 0)'>+ Fixed Some Broken Features (Bypass Eyes, etc)</font>",
+        "22/8/2026",
+
+		"<font color='rgb(0, 255, 0)'>Script Upload</font>",
     }
 
     local function CloneReference(Object)
@@ -55,14 +52,4 @@ return function(Window)
     local Executor = InfoTab:AddRightGroupbox("Executor Info")
     Executor:AddLabel("Name: " .. Name, true)
 	Executor:AddLabel("Version: " .. (Version and Version or "N/A"), true)
-    Executor:AddDivider()
-    Executor:AddLabel("Test Result: ", true)
-
-    for Index, Result in pairs(Abysall.Environment.Results) do
-		-- fix for veloshitty 💔
-		Result = Result:gsub("<", "(")
-		Result = Result:gsub(">", ")")
-		
-        Executor:AddLabel(Result, true)
-    end
 end
