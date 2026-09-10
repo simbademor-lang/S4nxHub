@@ -179,7 +179,7 @@ local Library = {
     --// Search \\--
     SearchText = "",
     Searching = false,
-    GlobalSearch = false,
+    GlobalSearch = true,
     LastSearchTab = nil,
 
     --// Tabs \\--
@@ -251,7 +251,7 @@ local Library = {
     ToggleKeybind = Enum.KeyCode.RightControl,
     ShowToggleFrameInKeybinds = true,
 
-    NotifyOnError = false,
+    NotifyOnError = true,
     ShowCustomCursor = true,
     ForceCheckbox = false,
 
